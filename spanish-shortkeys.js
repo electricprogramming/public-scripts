@@ -123,7 +123,7 @@ if (!window.isSpanishKeyboardShortcutsLoaded) {
     document.addEventListener('visibilitychange', clear);
     window.addEventListener('blur', clear);
     window.addEventListener('focus', clear);
-    let handleKeysUpdate = (currentKeys,e) => {
+    function handleKeysUpdate (currentKeys, e) {
       function insertChar(char) {
         const activeElement = document.activeElement;
         if (activeElement instanceof HTMLInputElement || activeElement instanceof HTMLTextAreaElement) {
@@ -147,7 +147,7 @@ if (!window.isSpanishKeyboardShortcutsLoaded) {
           activeElement.focus();
         }
       }
-      if (currentKeys.includesAll(['Control',"Quote"])) {
+      if (currentKeys.includesAll(['Control', 'Quote'])) {
         if (currentKeys.includes('KeyA')) {
           e.preventDefault(); /* these call e.preventDefault() so that unwanted default actions do not occur. For example, in Chrome, Ctrl+Shift+A
           opens a modal to search open/recently closed tabs, and we do not want that happening when trying to make uppercase Á via Ctrl+Shift+'+A. */
@@ -165,15 +165,18 @@ if (!window.isSpanishKeyboardShortcutsLoaded) {
           e.preventDefault();
           insertChar(currentKeys.includes('Shift')? 'Ú' : 'ú');
         }
-      } else if (currentKeys.includesAll(['Alt','Shift','Digit1'])) {
+      } else if (currentKeys.includesAll(['Alt', 'Shift', 'Digit1'])) {
         e.preventDefault();
         insertChar('¡');
-      } else if (currentKeys.includesAll(['Alt','Shift','Slash'])) {
+      } else if (currentKeys.includesAll(['Alt', 'Shift', 'Slash'])) {
         e.preventDefault();
         insertChar('¿');
-      } else if (currentKeys.includesAll(['Control','Alt','KeyN'])) {
+      } else if (currentKeys.includesAll(['Control', 'Alt', 'KeyN'])) {
         e.preventDefault();
         insertChar(currentKeys.includes('Shift')? 'Ñ' : 'ñ');
+      } else if (currentKeys.includesAll(['Control', 'Alt', 'KeyU'])) {
+        e.preventDefault();
+        insertChar(currentKeys.includes('Shift')? 'Ü' : 'ü')
       }
     }
   })();
