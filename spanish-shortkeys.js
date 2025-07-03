@@ -44,7 +44,7 @@
   bypass them. In Chrome, this would be by typing 'allow pasting' and hitting Enter.
   Other browsers may differ.
   Be careful not to run it more than once, as that would run multiple copies of it, which
-  would basically type the desired character multiple times.
+  might type the desired character multiple times.
 */
 
 
