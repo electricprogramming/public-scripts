@@ -10,7 +10,7 @@
        it could be easily adapted to keep a keylog or another script could access
        its variables somehow, such as the currentKeys variable.
        This should not cause much of an issue, however as
-         1) Any other malicious script could easily create its own keylogs, and this 
+         1) Any other malicious script could easily create its own keylogs, and this
             should not affect it at all.
          2) It is very hard or impossible for another script to access this script's variables, as
             this script is contained within an IIFE (Immediately Invoked Function Expression) and
@@ -24,9 +24,9 @@
 
   These are designed for being able to type quickly in Spanish, without the issue
   of special characters like á, ñ, ¡, etc.
-  
+
   HOW TO USE
-  
+
     Each unusual character has a specific keyboard shortcut:
       Á/á/É/é/Í/í/Ó/ó/Ú/ú:
         Ctrl + ' + [Desired vowel] -- use shift for capitalization
@@ -76,9 +76,9 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
-if (!window.isSpanishKeyboardShortcutsLoaded) {
+if (!window._isElectricProgrammingSpanishKeyboardShortcutsLoaded) {
   (function(){
-    window.isSpanishKeyboardShortcutsLoaded = true;
+    window._isElectricProgrammingSpanishKeyboardShortcutsLoaded = true;
     Array.prototype.includesAll = function(arr) {
       try {
         return arr.every(item => this.includes(item));
@@ -129,9 +129,9 @@ if (!window.isSpanishKeyboardShortcutsLoaded) {
         if (activeElement instanceof HTMLInputElement || activeElement instanceof HTMLTextAreaElement) {
           const start = activeElement.selectionStart;
           const end = activeElement.selectionEnd;
-          activeElement.value = 
-            activeElement.value.substring(0, start) + 
-            char + 
+          activeElement.value =
+            activeElement.value.substring(0, start) +
+            char +
             activeElement.value.substring(end);
           activeElement.setSelectionRange(start + 1, start + 1);
           activeElement.focus();
