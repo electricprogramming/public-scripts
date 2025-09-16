@@ -79,104 +79,112 @@ OTHER DEALINGS IN THE SOFTWARE.
 if (!window.isSpanishKeyboardShortcutsLoaded) {
   (function(){
     window.isSpanishKeyboardShortcutsLoaded = true;
-    Array.prototype.includesAll = function(arr) {
-      try {
-        return arr.every(item => this.includes(item));
-      } catch (e) {
-        return false;
+    function XOR(a, b) {
+      return (a || b) && !(a && b);
+    }
+    class Set extends window.Set {
+      hasAll(...items) {
+        try {
+          return items.every(item => this.has(item));
+        } catch {
+          return false;
+        }
       }
-    };
-    let keysPressed = new Set();
+    }
+    let currentKeys = new Set();
     document.addEventListener('keydown', (e) => {
       // Makes Shift, Alt, Control, etc. keys simply that, instead of ShiftLeft, ControlRight, etc. as there is no need to differentiate.
       // Uses e.code instead of e.key so shift doesn't mess up the Set of keys (by making 'A' and 'a' seperate, which can make unexistent keys linger.)
       if (e.code.startsWith('Shift')) {
-        keysPressed.add('Shift');
+        currentKeys.add('Shift');
       } else if (e.code.startsWith('Control')) {
-        keysPressed.add('Control');
+        currentKeys.add('Control');
       } else if (e.code.startsWith('Alt')) {
-        keysPressed.add('Alt');
+        currentKeys.add('Alt');
       } else if (e.code.startsWith('Meta')) {
-        keysPressed.add('Meta');
+        currentKeys.add('Meta');
       } else if (e.code === 'Tab') { // Omit tab key because it lingers in set after being released -- document may leave focus if run in browser or other similar environments. Other possibility is to call e.preventDefault and create custom logic, but only if the tab key should mean something BY ITSELF.
       } else {
-        keysPressed.add(e.code);
+        currentKeys.add(e.code);
       }
-      handleKeysUpdate(Array.from(keysPressed), e);
+      handleKeysUpdate(currentKeys, e);
     });
     document.addEventListener('keyup', (e) => {
       if (e.code.startsWith('Shift')) {
-        keysPressed.delete('Shift');
+        currentKeys.delete('Shift');
       } else if (e.code.startsWith('Control')) {
-        keysPressed.delete('Control');
+        currentKeys.delete('Control');
       } else if (e.code.startsWith('Alt')) {
-        keysPressed.delete('Alt');
+        currentKeys.delete('Alt');
       } else if (e.code.startsWith('Meta')) {
-        keysPressed.delete('Meta');
+        currentKeys.delete('Meta');
       } else {
-        keysPressed.delete(e.code);
+        currentKeys.delete(e.code);
       }
-      handleKeysUpdate(Array.from(keysPressed), e);
+      handleKeysUpdate(currentKeys, e);
     });
+    function isCaps(e) {
+      return XOR(currentKeys.has('Shift'), e.getModifierState('CapsLock'));
+    }
     // clears all keys pressed when window changes (to avoid issues with alt+tab, ctrl+tab.)
-    function clear () { keysPressed.clear(); }
+    function clear () { currentKeys.clear(); }
     document.addEventListener('visibilitychange', clear);
     window.addEventListener('blur', clear);
     window.addEventListener('focus', clear);
-    function handleKeysUpdate (currentKeys, e) {
-      function insertChar(char) {
-        const activeElement = document.activeElement;
-        if (activeElement instanceof HTMLInputElement || activeElement instanceof HTMLTextAreaElement) {
-          const start = activeElement.selectionStart;
-          const end = activeElement.selectionEnd;
-          activeElement.value =
-            activeElement.value.substring(0, start) +
-            char +
-            activeElement.value.substring(end);
-          activeElement.setSelectionRange(start + 1, start + 1);
-          activeElement.focus();
-        } else if (activeElement.isContentEditable) {
-          const selection = window.getSelection();
-          const range = selection.getRangeAt(0);
-          const textNode = document.createTextNode(char);
-          range.insertNode(textNode);
-          range.setStartAfter(textNode);
-          range.setEndAfter(textNode);
-          selection.removeAllRanges();
-          selection.addRange(range);
-          activeElement.focus();
-        }
+    function insertChar(char) {
+      const activeElement = document.activeElement;
+      if (activeElement instanceof HTMLInputElement || activeElement instanceof HTMLTextAreaElement) {
+        const start = activeElement.selectionStart;
+        const end = activeElement.selectionEnd;
+        activeElement.value =
+          activeElement.value.substring(0, start) +
+          char +
+          activeElement.value.substring(end);
+        activeElement.setSelectionRange(start + 1, start + 1);
+        activeElement.focus();
+      } else if (activeElement.isContentEditable) {
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        const textNode = document.createTextNode(char);
+        range.insertNode(textNode);
+        range.setStartAfter(textNode);
+        range.setEndAfter(textNode);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        activeElement.focus();
       }
-      if (currentKeys.includesAll(['Control', 'Quote'])) {
-        if (currentKeys.includes('KeyA')) {
+    }
+    function handleKeysUpdate(currentKeys, e) {
+      if (currentKeys.hasAll('Control', 'Quote')) {
+        if (currentKeys.has('KeyA')) {
           e.preventDefault(); /* these call e.preventDefault() so that unwanted default actions do not occur. For example, in Chrome, Ctrl+Shift+A
           opens a modal to search open/recently closed tabs, and we do not want that happening when trying to make uppercase Á via Ctrl+Shift+'+A. */
-          insertChar(currentKeys.includes('Shift')? 'Á' : 'á');
-        } else if (currentKeys.includes('KeyE')) {
+          insertChar(isCaps(e)? 'Á' : 'á');
+        } else if (currentKeys.has('KeyE')) {
           e.preventDefault();
-          insertChar(currentKeys.includes('Shift')? 'É' : 'é');
-        } else if (currentKeys.includes('KeyI')) {
+          insertChar(isCaps(e)? 'É' : 'é');
+        } else if (currentKeys.has('KeyI')) {
           e.preventDefault();
-          insertChar(currentKeys.includes('Shift')? 'Í' : 'í');
-        } else if (currentKeys.includes('KeyO')) {
+          insertChar(isCaps(e)? 'Í' : 'í');
+        } else if (currentKeys.has('KeyO')) {
           e.preventDefault();
-          insertChar(currentKeys.includes('Shift')? 'Ó' : 'ó');
-        } else if (currentKeys.includes('KeyU')) {
+          insertChar(isCaps(e)? 'Ó' : 'ó');
+        } else if (currentKeys.has('KeyU')) {
           e.preventDefault();
-          insertChar(currentKeys.includes('Shift')? 'Ú' : 'ú');
+          insertChar(isCaps(e)? 'Ú' : 'ú');
         }
-      } else if (currentKeys.includesAll(['Alt', 'Shift', 'Digit1'])) {
+      } else if (currentKeys.hasAll('Alt', 'Shift', 'Digit1')) {
         e.preventDefault();
         insertChar('¡');
-      } else if (currentKeys.includesAll(['Alt', 'Shift', 'Slash'])) {
+      } else if (currentKeys.hasAll('Alt', 'Shift', 'Slash')) {
         e.preventDefault();
         insertChar('¿');
-      } else if (currentKeys.includesAll(['Control', 'Alt', 'KeyN'])) {
+      } else if (currentKeys.hasAll('Control', 'Alt', 'KeyN')) {
         e.preventDefault();
-        insertChar(currentKeys.includes('Shift')? 'Ñ' : 'ñ');
-      } else if (currentKeys.includesAll(['Control', 'Alt', 'KeyU'])) {
+        insertChar(isCaps(e)? 'Ñ' : 'ñ');
+      } else if (currentKeys.hasAll('Control', 'Alt', 'KeyU')) {
         e.preventDefault();
-        insertChar(currentKeys.includes('Shift')? 'Ü' : 'ü')
+        insertChar(isCaps(e)? 'Ü' : 'ü')
       }
     }
   })();
