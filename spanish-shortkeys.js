@@ -93,7 +93,7 @@ if (!window.isSpanishKeyboardShortcutsLoaded) {
     }
     let currentKeys = new Set();
     document.addEventListener('keydown', (e) => {
-      // Makes Shift, Alt, Control, etc. keys simply that, instead of ShiftLeft, ControlRight, etc. as there is no need to differentiate.
+      // Simplifies keys like Shift, Alt, and Control to their base names, ignoring left/right variants like ShiftLeft or ControlRight.
       // Uses e.code instead of e.key so shift doesn't mess up the Set of keys (by making 'A' and 'a' seperate, which can make unexistent keys linger.)
       if (e.code.startsWith('Shift')) {
         currentKeys.add('Shift');
@@ -108,7 +108,7 @@ if (!window.isSpanishKeyboardShortcutsLoaded) {
         currentKeys.add(e.code);
       }
       handleKeysUpdate(currentKeys, e);
-    });
+    }, { capture: true });
     document.addEventListener('keyup', (e) => {
       if (e.code.startsWith('Shift')) {
         currentKeys.delete('Shift');
@@ -122,7 +122,7 @@ if (!window.isSpanishKeyboardShortcutsLoaded) {
         currentKeys.delete(e.code);
       }
       handleKeysUpdate(currentKeys, e);
-    });
+    }, { capture: true });
     function isCaps(e) {
       return XOR(currentKeys.has('Shift'), e.getModifierState('CapsLock'));
     }
